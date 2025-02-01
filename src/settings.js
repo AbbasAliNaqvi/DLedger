@@ -1,29 +1,74 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./NavBar";
 import Footer from "./Footer";
 
 function Settings() {
-  const [theme, setTheme] = useState("light");
-  const [emailNotifications, setEmailNotifications] = useState(false);
-  const [smsNotifications, setSmsNotifications] = useState(false);
-  const [locationAccess, setLocationAccess] = useState(false);
-  const [twitterHandle, setTwitterHandle] = useState("");
-  const [facebookLink, setFacebookLink] = useState("");
-  const [instagramHandle, setInstagramHandle] = useState("");
+  const [account, setAccount] = useState(null);
+  const [balance, setBalance] = useState(null);
+  const [chainId, setChainId] = useState(null);
+  const [networkName, setNetworkName] = useState(null);
+  const [blockTimestamp, setBlockTimestamp] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const settings = {
-      theme,
-      emailNotifications,
-      smsNotifications,
-      locationAccess,
-      twitterHandle,
-      facebookLink,
-      instagramHandle,
+  // Helper function to get network name from chainId
+  const getNetworkName = (chainId) => {
+    const networks = {
+      "0x1": "Ethereum Mainnet",
+      "0x3": "Ropsten Testnet",
+      "0x4": "Rinkeby Testnet",
+      "0x5": "Goerli Testnet",
+      "0x2a": "Kovan Testnet",
+      // Add more networks here if needed
     };
-    console.log("Settings saved:", settings);
-    alert("Settings have been saved!");
+
+    return networks[chainId] || "Unknown Network";
+  };
+
+  useEffect(() => {
+    const connectMetaMask = async () => {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+          if (accounts && accounts.length > 0) {
+            const account = accounts[0];
+            setAccount(account); // Set account address
+
+            // Get chainId (network)
+            const chainId = await window.ethereum.request({ method: "eth_chainId" });
+            setChainId(chainId); // Set chain ID
+            setNetworkName(getNetworkName(chainId)); // Set network name based on chainId
+
+            // Get account balance
+            const balanceWei = await window.ethereum.request({
+              method: "eth_getBalance",
+              params: [account, "latest"],
+            });
+            const balance = parseFloat(balanceWei) / 10 ** 18; // Convert Wei to Ether
+            setBalance(balance); // Set account balance
+
+            // Get timestamp of the latest block
+            const block = await window.ethereum.request({
+              method: "eth_getBlockByNumber",
+              params: ["latest", false],
+            });
+            setBlockTimestamp(new Date(block.timestamp * 1000).toLocaleString()); // Convert to readable format
+          } else {
+            console.warn("MetaMask: No accounts found.");
+          }
+        } catch (error) {
+          console.error("MetaMask Error:", error);
+        }
+      } else {
+        console.warn("MetaMask not installed.");
+      }
+    };
+
+    connectMetaMask();
+  }, []);
+
+  const handleLogout = () => {
+    // Implement logout logic here
+    console.log("Logged out");
+    // You might want to redirect to a login page or clear some state
   };
 
   const styles = {
@@ -31,230 +76,107 @@ function Settings() {
       minHeight: "100vh",
       display: "flex",
       flexDirection: "column",
-      boxSizing: "border-box",
     },
-    mainContent: {
-      flex: 1,
-      padding: "20px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
+    main: {
+      flexGrow: 1,
       backgroundColor: "#fff",
+      padding: "24px",
+    },
+    content: {
+      maxWidth: "600px",
+      margin: "0 auto",
     },
     heading: {
+      fontSize: "2rem",
+      fontWeight: "bold",
       textAlign: "center",
-      color: "#3a855d",
-      fontSize: "2.5em",
-      fontWeight: "bold",
-      marginBottom: "20px",
+      color: "black",
+      marginBottom: "32px",
     },
-    form: {
-      width: "100%",
-      maxWidth: "600px",
-      padding: "20px",
-      backgroundColor: "#f8f8f8",
-      border: "1px solid #3a855d",
-      borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    card: {
+      backgroundColor: "#f3f4f6",
+      padding: "24px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
-    sectionTitle: {
-      marginTop: "20px",
-      color: "#3a855d",
-      fontSize: "1.2em",
-      fontWeight: "bold",
-      borderBottom: "2px solid #3a855d",
-      paddingBottom: "8px",
+    subheading: {
+      fontSize: "1.25rem",
+      fontWeight: "600",
+      marginBottom: "16px",
     },
-    label: {
-      display: "block",
-      marginTop: "15px",
-      marginBottom: "5px",
-      color: "#000",
-      fontSize: "1em",
-      fontWeight: "500",
+    accountText: {
+      marginBottom: "16px",
     },
-    input: {
-      width: "100%",
-      padding: "10px",
-      marginBottom: "15px",
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      backgroundColor: "#fff",
-      color: "#000",
-      fontSize: "1em",
-    },
-    checkboxLabel: {
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "15px",
-      fontSize: "1em",
-    },
-    checkbox: {
-      marginRight: "10px",
+    accountAddress: {
+      fontFamily: "monospace",
     },
     button: {
-      backgroundColor: "#3a855d",
-      border: "none",
-      padding: "12px 20px",
-      borderRadius: "5px",
+      width: "100%",
+      backgroundColor: "#dc2626",
       color: "#fff",
-      fontSize: "1.2em",
-      fontWeight: "bold",
+      padding: "8px 16px",
+      borderRadius: "4px",
+      border: "none",
       cursor: "pointer",
-      width: "100%",
-      transition: "all 0.3s ease-in-out",
+      transition: "background-color 0.3s",
     },
-    buttonHover: {
-      backgroundColor: "#2e6a4b",
-    },
-    contactSection: {
-      marginTop: "30px",
-      textAlign: "center",
-      backgroundColor: "#f8f8f8",
-      padding: "15px",
-      border: "1px solid #3a855d",
+    contactCard: {
+      marginTop: "32px",
+      backgroundColor: "#f3f4f6",
+      padding: "24px",
       borderRadius: "8px",
-      width: "100%",
-      maxWidth: "600px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
     link: {
-      color: "#3a855d",
+      color: "#15803d",
       textDecoration: "none",
-      fontWeight: "bold",
     },
   };
 
   return (
     <div style={styles.container}>
-      {/* Navbar */}
       <Navbar />
-
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        <h1 style={styles.heading}>Website Settings</h1>
-        <form style={styles.form} onSubmit={handleSubmit}>
-          {/* Appearance Section */}
-          <h2 style={styles.sectionTitle}>Appearance</h2>
-          <label style={styles.label} htmlFor="theme">
-            Choose Theme:
-          </label>
-          <select
-            style={styles.input}
-            id="theme"
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-          >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="auto">Auto</option>
-          </select>
-
-          {/* Notifications Section */}
-          <h2 style={styles.sectionTitle}>Notifications</h2>
-          <div style={styles.checkboxLabel}>
-            <input
-              style={styles.checkbox}
-              type="checkbox"
-              id="email-notifications"
-              checked={emailNotifications}
-              onChange={() => setEmailNotifications(!emailNotifications)}
-            />
-            <label htmlFor="email-notifications">
-              Enable Email Notifications
-            </label>
+      <main style={styles.main}>
+        <div style={styles.content}>
+          <h1 style={styles.heading}>Account Settings</h1>
+          <div style={styles.card}>
+            <h2 style={styles.subheading}>MetaMask Account</h2>
+            {account ? (
+              <>
+                <p style={styles.accountText}>
+                  Connected: <span style={styles.accountAddress}>{account}</span>
+                </p>
+                <p style={styles.accountText}>Balance: {balance} ETH</p>
+                <p style={styles.accountText}>Chain ID: {chainId}</p>
+                <p style={styles.accountText}>Network: {networkName}</p>
+                <p style={styles.accountText}>Last Block Timestamp: {blockTimestamp}</p>
+              </>
+            ) : (
+              <p style={styles.accountText}>Not connected to MetaMask</p>
+            )}
+            <button onClick={handleLogout} style={styles.button}>
+              Logout
+            </button>
           </div>
-          <div style={styles.checkboxLabel}>
-            <input
-              style={styles.checkbox}
-              type="checkbox"
-              id="sms-notifications"
-              checked={smsNotifications}
-              onChange={() => setSmsNotifications(!smsNotifications)}
-            />
-            <label htmlFor="sms-notifications">
-              Enable SMS Notifications
-            </label>
+          <div style={styles.contactCard}>
+            <h2 style={styles.subheading}>Contact Us</h2>
+            <p style={styles.accountText}>Join our community for more support:</p>
+            <p style={styles.accountText}>
+              Discord:{" "}
+              <a href="#" style={styles.link}>
+                Join our Discord
+              </a>
+            </p>
+            <p style={styles.accountText}>
+              Telegram:{" "}
+              <a href="#" style={styles.link}>
+                Join our Telegram
+              </a>
+            </p>
+            <p>Email: admin@hadnt.com</p>
           </div>
-
-          {/* Privacy Section */}
-          <h2 style={styles.sectionTitle}>Privacy Settings</h2>
-          <div style={styles.checkboxLabel}>
-            <input
-              style={styles.checkbox}
-              type="checkbox"
-              id="location-access"
-              checked={locationAccess}
-              onChange={() => setLocationAccess(!locationAccess)}
-            />
-            <label htmlFor="location-access">Allow Location Access</label>
-          </div>
-
-          {/* Social Media Section */}
-          <h2 style={styles.sectionTitle}>Social Media</h2>
-          <label style={styles.label} htmlFor="twitter-handle">
-            Twitter Handle:
-          </label>
-          <input
-            style={styles.input}
-            type="text"
-            id="twitter-handle"
-            value={twitterHandle}
-            onChange={(e) => setTwitterHandle(e.target.value)}
-            placeholder="@YourTwitter"
-          />
-          <label style={styles.label} htmlFor="facebook-link">
-            Facebook Profile URL:
-          </label>
-          <input
-            style={styles.input}
-            type="url"
-            id="facebook-link"
-            value={facebookLink}
-            onChange={(e) => setFacebookLink(e.target.value)}
-            placeholder="https://facebook.com/your-profile"
-          />
-          <label style={styles.label} htmlFor="instagram-handle">
-            Instagram Handle:
-          </label>
-          <input
-            style={styles.input}
-            type="text"
-            id="instagram-handle"
-            value={instagramHandle}
-            onChange={(e) => setInstagramHandle(e.target.value)}
-            placeholder="@YourInstagram"
-          />
-
-          <button
-            style={styles.button}
-            onMouseOver={(e) =>
-              (e.target.style.backgroundColor =
-                styles.buttonHover.backgroundColor)
-            }
-            onMouseOut={(e) =>
-              (e.target.style.backgroundColor = styles.button.backgroundColor)
-            }
-            type="submit"
-          >
-            Save Settings
-          </button>
-        </form>
-
-        {/* Contact Section */}
-        <div style={styles.contactSection}>
-          <h2>Connect with Our Support</h2>
-          <p>Join our community for more support:</p>
-          <p>
-            Discord: <a style={styles.link} href="#">Join our Discord</a>
-          </p>
-          <p>
-            Telegram: <a style={styles.link} href="#">Join our Telegram</a>
-          </p>
-          <p>Email: admin@hadnt.com</p>
         </div>
-      </div>
-
-      {/* Footer */}
+      </main>
       <Footer />
     </div>
   );
