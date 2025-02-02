@@ -2,6 +2,7 @@
   "name": "d_ledger",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
