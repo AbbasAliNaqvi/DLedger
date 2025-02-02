@@ -48,7 +48,8 @@ function SignIn({ switchView }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid; // Get user UID
       localStorage.setItem('uid', uid); // Store UID in local storage or use a context/state for better management
-      navigate('/metamask'); // Navigate without passing UID in URL
+      // navigate('/metamask'); // Navigate without passing UID in URL
+      navigate('/dashboard'); // Navigate without passing UID in URL
     } catch (error) {
       alert(`Sign In Error: ${error.message}`);
     }
@@ -84,7 +85,9 @@ function SignUp({ switchView }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid; // Get user UID
       localStorage.setItem('uid', uid); // Store UID in local storage or use a context/state for better management
-      navigate('/metamask'); // Navigate without passing UID in URL
+      // navigate('/metamask'); // Navigate without passing UID in URL
+      navigate('/dashboard'); // Navigate without passing UID in URL
+
     } catch (error) {
       alert(`Sign Up Error: ${error.message}`);
     }

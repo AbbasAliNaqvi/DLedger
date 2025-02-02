@@ -2,61 +2,37 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import Dledgerbg from './DLedgerbg.jpg';
-import { onAuthStateChanged } from 'firebase/auth'; // Only import onAuthStateChanged
-import { auth } from './firebaseConfig'; // Import auth object from firebaseConfig.js
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebaseConfig';
 
 function Dashboard() {
   const [uid, setUid] = useState(null);
-  const [account, setAccount] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch the uid from Firebase Authentication
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUid(user.uid); // Set the uid from the authenticated user
+        setUid(user.uid);
       } else {
         setError("No user UID found. Please login first.");
-        navigate('/login'); // Redirect to login if no user is authenticated
+        navigate('/login');
       }
     });
 
-    // Cleanup the subscription to the authentication state
     return () => unsubscribe();
   }, [navigate]);
 
+  // Wait 3 seconds before navigating to /properties after UID is set
   useEffect(() => {
-    // Check for MetaMask and get the wallet address
-    if (window.ethereum) {
-      window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then((accounts) => {
-          if (accounts && accounts.length > 0) {
-            setAccount(accounts[0]);
-          } else {
-            setError("No wallet address found. Please connect your wallet.");
-            navigate('/metamask'); // Redirect to MetaMask if no wallet is connected
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching wallet address:', error);
-          setError("Error fetching wallet address. Please connect your wallet.");
-          navigate('/metamask');
-        });
-    } else {
-      setError("MetaMask extension not found. Please install it.");
-      navigate('/metamask'); // Redirect if MetaMask is not installed
-    }
-  }, [navigate]);
+    if (uid) {
+      const timer = setTimeout(() => {
+        navigate('/properties');
+      }, 3000);
 
-  // If both UID and wallet are set, navigate to the Home page
-  useEffect(() => {
-    if (uid && account) {
-      setTimeout(() => {
-        navigate('/properties'); // Navigate to Home page after successful login and wallet connection
-      }, 3000); // 3-second delay
+      return () => clearTimeout(timer); // Cleanup timer if component unmounts
     }
-  }, [uid, account, navigate]);
+  }, [uid, navigate]);
 
   const backgroundStyle = {
     backgroundImage: `url(${Dledgerbg})`,
@@ -71,16 +47,15 @@ function Dashboard() {
         <h1>Welcome to Your Dashboard</h1>
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        {uid && account ? (
+        {uid ? (
           <div className="dashboard-info">
             <h2>User Information</h2>
             <p>UID: {uid}</p>
-            <p>Wallet Connected: {account}</p>
+            <p>Redirecting to properties in 3 seconds...</p>
           </div>
         ) : (
           <div className="dashboard-info">
-            <h2>No Wallet Connected</h2>
-            <p>Please connect your wallet to continue.</p>
+            <p>Loading user information...</p>
           </div>
         )}
       </div>

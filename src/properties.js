@@ -46,7 +46,6 @@ export default function App() {
   const [estates, setEstates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [account, setAccount] = useState(null)
   const { debug } = useControls({ debug: false })
 
   useEffect(() => {
@@ -58,21 +57,21 @@ export default function App() {
       }
     })
 
-    if (window.ethereum) {
-      window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then((accounts) => {
-          if (accounts && accounts.length > 0) {
-            setAccount(accounts[0])
-          } else {
-            console.warn('No accounts found, prompting user.');
-          }
-        })
-        .catch((error) => {
-          console.error('MetaMask connection failed:', error);
-        });
-    } else {
-      console.warn('MetaMask is not installed.');
-    }
+    // if (window.ethereum) {
+    //   window.ethereum.request({ method: 'eth_requestAccounts' })
+    //     .then((accounts) => {
+    //       if (accounts && accounts.length > 0) {
+    //         setAccount(accounts[0])
+    //       } else {
+    //         console.warn('No accounts found, prompting user.');
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error('MetaMask connection failed:', error);
+    //     });
+    // } else {
+    //   console.warn('MetaMask is not installed.');
+    // }
 
     return () => unsubscribe()
   }, [navigate])

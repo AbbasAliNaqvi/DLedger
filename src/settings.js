@@ -23,47 +23,47 @@ function Settings() {
     return networks[chainId] || "Unknown Network";
   };
 
-  useEffect(() => {
-    const connectMetaMask = async () => {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-          if (accounts && accounts.length > 0) {
-            const account = accounts[0];
-            setAccount(account); // Set account address
+  // useEffect(() => {
+  //   const connectMetaMask = async () => {
+  //     if (window.ethereum) {
+  //       try {
+  //         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+  //         if (accounts && accounts.length > 0) {
+  //           const account = accounts[0];
+  //           setAccount(account); // Set account address
 
-            // Get chainId (network)
-            const chainId = await window.ethereum.request({ method: "eth_chainId" });
-            setChainId(chainId); // Set chain ID
-            setNetworkName(getNetworkName(chainId)); // Set network name based on chainId
+  //           // Get chainId (network)
+  //           const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  //           setChainId(chainId); // Set chain ID
+  //           setNetworkName(getNetworkName(chainId)); // Set network name based on chainId
 
-            // Get account balance
-            const balanceWei = await window.ethereum.request({
-              method: "eth_getBalance",
-              params: [account, "latest"],
-            });
-            const balance = parseFloat(balanceWei) / 10 ** 18; // Convert Wei to Ether
-            setBalance(balance); // Set account balance
+  //           // Get account balance
+  //           const balanceWei = await window.ethereum.request({
+  //             method: "eth_getBalance",
+  //             params: [account, "latest"],
+  //           });
+  //           const balance = parseFloat(balanceWei) / 10 ** 18; // Convert Wei to Ether
+  //           setBalance(balance); // Set account balance
 
-            // Get timestamp of the latest block
-            const block = await window.ethereum.request({
-              method: "eth_getBlockByNumber",
-              params: ["latest", false],
-            });
-            setBlockTimestamp(new Date(block.timestamp * 1000).toLocaleString()); // Convert to readable format
-          } else {
-            console.warn("MetaMask: No accounts found.");
-          }
-        } catch (error) {
-          console.error("MetaMask Error:", error);
-        }
-      } else {
-        console.warn("MetaMask not installed.");
-      }
-    };
+  //           // Get timestamp of the latest block
+  //           const block = await window.ethereum.request({
+  //             method: "eth_getBlockByNumber",
+  //             params: ["latest", false],
+  //           });
+  //           setBlockTimestamp(new Date(block.timestamp * 1000).toLocaleString()); // Convert to readable format
+  //         } else {
+  //           console.warn("MetaMask: No accounts found.");
+  //         }
+  //       } catch (error) {
+  //         console.error("MetaMask Error:", error);
+  //       }
+  //     } else {
+  //       console.warn("MetaMask not installed.");
+  //     }
+  //   };
 
-    connectMetaMask();
-  }, []);
+  //   connectMetaMask();
+  // }, []);
 
   const handleLogout = () => {
     // Implement logout logic here
