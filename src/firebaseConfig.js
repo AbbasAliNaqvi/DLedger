@@ -1,6 +1,5 @@
-// firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -18,6 +17,15 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication
 const auth = getAuth(firebaseApp);
+
+// Set persistence to local (so the user stays logged in even after page reload)
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    // Persistence is now set
+  })
+  .catch((error) => {
+    console.error("Error setting persistence:", error.message);
+  });
 
 // Initialize Firestore
 const db = getFirestore(firebaseApp);
