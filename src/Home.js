@@ -7,7 +7,7 @@ import { auth } from './firebaseConfig';
 
 
 function Home() {
-  const [account, setAccount] = useState(null);
+  // const [account, setAccount] = useState(null);
   const [properties, setProperties] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,29 +23,29 @@ function Home() {
       }
     });
 
-    // MetaMask: Check if MetaMask is installed and connect wallet
-    const handleMetaMaskConnection = async () => {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          if (accounts && accounts.length > 0) {
-            console.log("MetaMask Connected:", accounts[0]);
-            setAccount(accounts[0]);
-          } else {
-            console.warn("MetaMask: No accounts found.");
-            navigate('/metamask');
-          }
-        } catch (error) {
-          console.error('MetaMask Error:', error);
-          navigate('/metamask');
-        }
-      } else {
-        console.warn("MetaMask not installed.");
-        navigate('/metamask');
-      }
-    };
+    // // MetaMask: Check if MetaMask is installed and connect wallet
+    // const handleMetaMaskConnection = async () => {
+    //   if (window.ethereum) {
+    //     try {
+    //       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    //       if (accounts && accounts.length > 0) {
+    //         console.log("MetaMask Connected:", accounts[0]);
+    //         setAccount(accounts[0]);
+    //       } else {
+    //         console.warn("MetaMask: No accounts found.");
+    //         navigate('/metamask');
+    //       }
+    //     } catch (error) {
+    //       console.error('MetaMask Error:', error);
+    //       navigate('/metamask');
+    //     }
+    //   } else {
+    //     console.warn("MetaMask not installed.");
+    //     navigate('/metamask');
+    //   }
+    // };
 
-    handleMetaMaskConnection();
+    // handleMetaMaskConnection();
 
     // Fetch properties from the backend
     const fetchProperties = async () => {

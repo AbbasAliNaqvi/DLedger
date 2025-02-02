@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/metamask" element={<MetaMask />} />
+        {/* <Route path="/metamask" element={<MetaMask />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/home" element={<Home />} />
         <Route path="/properties" element={<Myproperties />}/>
